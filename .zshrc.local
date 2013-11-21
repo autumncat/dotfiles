@@ -336,7 +336,7 @@ cdpath=(.. ~)
 export GROFF_NO_SGR=1
 
 alias cp='cp -i -v'
-alias mv='mv -i -'
+alias mv='mv -i -v'
 alias rm='rm -i -v'
 alias ln='ln -i -v'
 
