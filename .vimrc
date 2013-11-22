@@ -197,6 +197,14 @@ autocmd BufReadPost *
 " Remember info about open buffers on close
 set viminfo^=%
 
+
+""""""""""""""""""""""""""""""
+" => Status line
+""""""""""""""""""""""""""""""
+" Always show the status line
+set laststatus=2
+
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "  End of modified amix's vimrc
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
