@@ -1,3 +1,8 @@
+" pathogen
+
+execute pathogen#infect()
+
+"
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Maintainer: 
 "       Amir Salihefendic
