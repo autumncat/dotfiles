@@ -200,3 +200,7 @@ set viminfo^=%
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "  End of modified amix's vimrc
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" YCM
+let g:ycm_collect_identifiers_from_comments_and_strings = 1
+let g:completion_request_timeout = 3
