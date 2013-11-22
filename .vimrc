@@ -212,3 +212,9 @@ set laststatus=2
 " YCM
 let g:ycm_collect_identifiers_from_comments_and_strings = 1
 let g:completion_request_timeout = 3
+
+" airline
+" set noru
+set noshowmode " airline shows this
+set cmdheight=1
+let g:airline_theme='molokai'
