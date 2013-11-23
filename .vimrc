@@ -127,12 +127,8 @@ set foldcolumn=1
 " Enable syntax highlighting
 syntax enable 
 
-try
-    colorscheme desert
-catch
-endtry
-
 set background=dark
+set cursorline
 
 " Set extra options when running in GUI mode
 if has("gui_running")
@@ -140,6 +136,13 @@ if has("gui_running")
     set guioptions-=e
     set t_Co=256
     set guitablabel=%M\ %t
+endif
+
+if &t_Co > 255
+    let g:rehash256=1
+    " let g:molokai_original = 1
+    colorscheme molokai
+    hi Normal ctermbg=none
 endif
 
 " Set utf8 as standard encoding and en_US as the standard language
