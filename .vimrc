@@ -221,3 +221,7 @@ let g:completion_request_timeout = 3
 set noshowmode " airline shows this
 set cmdheight=1
 let g:airline_theme='molokai'
+
+" ctrlp
+let g:ctrlp_show_hidden = 1
+let g:ctrlp_cmd = 'CtrlPBuffer'
