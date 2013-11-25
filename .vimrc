@@ -225,3 +225,11 @@ let g:airline_theme='molokai'
 " ctrlp
 let g:ctrlp_show_hidden = 1
 let g:ctrlp_cmd = 'CtrlPBuffer'
+
+" undotree
+let g:undotree_DiffCommand = "diff -u"
+let g:undotree_SetFocusWhenToggle = 1
+nnoremap <leader>u :UndotreeToggle<cr>
+" enable persistent undo
+set undofile
+set undodir=~/.vimundo
