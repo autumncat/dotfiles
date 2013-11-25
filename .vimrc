@@ -239,3 +239,6 @@ nnoremap <leader>e :NERDTreeToggle<cr>
 
 " easymotion
 let g:EasyMotion_keys = 'fjdkslgha'
+
+"tagbar
+nnoremap <leader>t :TagbarToggle<cr>
