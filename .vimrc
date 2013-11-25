@@ -247,3 +247,6 @@ nnoremap <leader>t :TagbarToggle<cr>
 let g:easytags_dynamic_files = 1
 let g:easytags_events = ['BufWritePost', 'BufReadPost']
 let g:easytags_include_members = 1
+
+" suppress output (for ag.vim)
+let &shellpipe='&>%s'
