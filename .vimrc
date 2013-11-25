@@ -233,3 +233,6 @@ nnoremap <leader>u :UndotreeToggle<cr>
 " enable persistent undo
 set undofile
 set undodir=~/.vimundo
+
+" nerdtree
+nnoremap <leader>e :NERDTreeToggle<cr>
