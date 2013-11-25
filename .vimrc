@@ -236,3 +236,6 @@ set undodir=~/.vimundo
 
 " nerdtree
 nnoremap <leader>e :NERDTreeToggle<cr>
+
+" easymotion
+let g:EasyMotion_keys = 'fjdkslgha'
