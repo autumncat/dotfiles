@@ -1,8 +1,38 @@
-" pathogen
+set nocompatible              " be iMproved, required
+filetype off                  " required
 
-execute pathogen#infect()
+" set the runtime path to include Vundle and initialize
+set rtp+=~/.vim/bundle/vundle/
+call vundle#rc()
 
-"
+" let Vundle manage Vundle, required
+Plugin 'gmarik/vundle'
+
+Plugin 'tomasr/molokai'
+Plugin 'bling/vim-airline'
+
+Plugin 'Shougo/unite.vim'
+Plugin 'Shougo/neomru.vim'
+Plugin 'Shougo/unite-outline'
+Plugin 'Shougo/vimproc'
+
+Plugin 'Lokaltog/vim-easymotion'
+Plugin 'kshenoy/vim-signature'
+Plugin 'myusuf3/numbers.vim'
+Plugin 'majutsushi/tagbar'
+Plugin 'mbbill/undotree'
+Plugin 'tpope/vim-commentary'
+Plugin 'tpope/vim-unimpaired'
+Plugin 'tpope/vim-repeat'
+
+Plugin 'Valloric/YouCompleteMe'
+Plugin 'SirVer/ultisnips'
+Plugin 'honza/vim-snippets'
+Plugin 'scrooloose/syntastic'
+
+" end of vundle list
+filetype plugin indent on
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Maintainer: 
 "       Amir Salihefendic
@@ -139,7 +169,7 @@ if has("gui_running")
 endif
 
 if &t_Co > 255
-    let g:rehash256=1
+    let g:rehash256 = 1
     " let g:molokai_original = 1
     colorscheme molokai
     hi Normal ctermbg=none
@@ -211,20 +241,35 @@ set laststatus=2
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "  End of modified amix's vimrc
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-" YCM
-let g:ycm_collect_identifiers_from_comments_and_strings = 1
-let g:completion_request_timeout = 3
-
 " airline
 " set noru
 set noshowmode " airline shows this
 set cmdheight=1
 let g:airline_theme='molokai'
 
-" ctrlp
-let g:ctrlp_show_hidden = 1
-let g:ctrlp_cmd = 'CtrlPBuffer'
+" unite
+call unite#filters#matcher_default#use(['matcher_fuzzy'])
+call unite#filters#sorter_default#use(['sorter_rank'])
+let g:unite_enable_start_insert = 1
+let g:unite_source_grep_command = 'ag'
+let g:unite_source_grep_default_opts = '--nogroup --nocolor --line-numbers'
+nnoremap <c-p> :<c-u>Unite buffer file_mru file<cr>
+nnoremap <c-l> :<c-u>Unite -auto-preview outline line<cr>
+nnoremap <leader>f :<c-u>Unite file_rec/async:!<cr>
+nnoremap <leader>g :<c-u>UniteWithCursorWord -buffer-name=unite-grep grep<cr>
+nnoremap <leader>r :<c-u>UniteResume unite-grep<cr>
+let g:unite_source_history_yank_enable = 1
+nnoremap <leader>y :<c-u>Unite history/yank<cr>
+
+" easymotion
+let g:EasyMotion_keys = 'fjdkslgha'
+let g:EasyMotion_smartcase = 1
+let g:EasyMotion_use_smartsign_us = 1
+map s <Plug>(easymotion-s2)
+map / <Plug>(easymotion-sn)
+
+" tagbar
+nnoremap <leader>t :TagbarToggle<cr>
 
 " undotree
 let g:undotree_DiffCommand = "diff -u"
@@ -234,19 +279,20 @@ nnoremap <leader>u :UndotreeToggle<cr>
 set undofile
 set undodir=~/.vimundo
 
-" nerdtree
-nnoremap <leader>e :NERDTreeToggle<cr>
+" ycm
+let g:ycm_global_ycm_extra_conf = '~/.ycm_extra_conf_noflag.py'
+let g:ycm_collect_identifiers_from_comments_and_strings = 1
+" let g:ycm_collect_identifiers_from_tags_files = 1
+" let g:ycm_seed_identifiers_with_syntax = 1
+let g:ycm_add_preview_to_completeopt = 1
+let g:ycm_autoclose_preview_window_after_completion = 1
+let g:ycm_autoclose_preview_window_after_insertion = 1
+let g:ycm_key_invoke_completion = '<c-l>'
 
-" easymotion
-let g:EasyMotion_keys = 'fjdkslgha'
+" ultisnip
+let g:UltiSnipsExpandTrigger = '<c-e>'
+let g:UltiSnipsJumpForwardTrigger = '<c-j>'
+let g:UltiSnipsJumpBackwardTrigger = '<c-k>'
 
-"tagbar
-nnoremap <leader>t :TagbarToggle<cr>
-
-" easytag
-let g:easytags_dynamic_files = 1
-let g:easytags_events = ['BufWritePost', 'BufReadPost']
-let g:easytags_include_members = 1
-
-" suppress output (for ag.vim)
-let &shellpipe='&>%s'
+" syntastics
+let g:syntastic_check_on_open = 1
