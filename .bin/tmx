@@ -3,45 +3,11 @@
 #
 # Tmux launcher
 #
-# See:
-#     http://github.com/brandur/tmux-extra
-#
 # Modified version of a script orginally found at:
 #     http://forums.gentoo.org/viewtopic-t-836006-start-0.html
 #
 
-#If we're running inside iTerm, integrate with its tmux support
-if [ x"$TERM_PROGRAM" = x"iTerm.app" ]; then
-  TMUX_CMD="tmux -CC"
-else
-  TMUX_CMD="tmux"
-fi
-
-# Works because bash automatically trims by assigning to variables and by 
-# passing arguments
-trim() { echo $1; }
-
-#TMUX_SUPPORTS_MINUS_F=$(tmux list-sessions -F '#{session_name}' > /dev/null 2>&1 && echo 0 || echo 1)
-#...but that hangs on Linux due to epoll problems -- see
-# https://sourceforge.net/tracker/?func=detail&atid=973262&aid=3489496&group_id=200378
-TMUX_SUPPORTS_MINUS_F=1  #disable -F support
-
-tmux-list-sessions() {
-    if [[ "$TMUX_SUPPORTS_MINUS_F" == 0 ]] ; then
-        tmux list-sessions -F '#{session_name}'
-    else
-        tmux list-sessions | cut -d: -f 1
-    fi
-}
-
-tmux-list-old-sessions() {
-    if [[ "$TMUX_SUPPORTS_MINUS_F" == 0 ]] ; then
-        tmux list-sessions -F '#{?session_attached,,#{?session_grouped,,#{session_name}}}'
-    else
-        tmux list-sessions 2>/dev/null | grep -v '(group [[:digit:]]\+)' | grep -v '(attached)' | cut -d: -f 1
-    fi
-}
-
+# Usage
 if [[ -z "$1" ]]; then
     echo "Specify session name as the first argument"
     exit
@@ -53,47 +19,60 @@ if [[ "$1" == "ls" ]]; then
     exit
 fi
 
-base_session="$1"
-# This actually works without the trim() on all systems except OSX
-tmux_nb=$(trim `tmux-list-sessions | grep -c "^$base_session$"`)
-if [[ "$tmux_nb" == "0" ]]; then
-    echo "Launching tmux base session $base_session ..."
-
-    # we separate 'new-session' and 'attach' to allow .tmux.conf
-    # commands to create the new session first with the right name
-    # (which is, after all, a simple convention so easily shared),
-    # which will (perversely) then cause this new-session command to
-    # exit with an error.  Despite this error, a new session with
-    # exactly that name has been created.  Then we can happily attach
-    # to it.  If .tmux.conf has no new-session command in it, our
-    # explicit 'new-session' creates it, and we attach happily, again,
-    # to it.
-    $TMUX_CMD new-session -d -s $base_session
-    $TMUX_CMD attach         -t $base_session
-
+#If we're running inside iTerm, integrate with its tmux support
+if [ x"$TERM_PROGRAM" = x"iTerm.app" ]; then
+    TMUX_CMD="tmux -CC"
 else
-    # Make sure we are not already in a tmux session
-    if [[ -z "$TMUX" ]]; then
-        # Kill defunct sessions first
-        for old_session_id in `tmux-list-old-sessions` ; do
-            tmux kill-session -t $old_session_id
-        done
-
-        echo "Launching copy of base session $base_session ..."
-
-        # Find a session prefix number that hasn't already been used
-        num_prefix=1
-        while [[ $(trim `tmux-list-sessions | grep "^$num_prefix,$base_session" | wc -l`) -gt 0 ]];
-        do
-            num_prefix=`expr $num_prefix + 1`
-        done
-        session_id="$num_prefix,$base_session"
-        # Create a new session (without attaching it) and link to base session
-        # to share windows
-        tmux new-session -d -t $base_session -s $session_id
-        # Attach to the new session
-        $TMUX_CMD attach-session -t $session_id
-        # When we detach from it, kill the session
-        $TMUX_CMD kill-session -t $session_id
-    fi
+    TMUX_CMD="tmux"
 fi
+
+# Works because bash automatically trims by assigning to variables and by 
+# passing arguments
+# trim() { echo $1; }
+
+#TMUX_SUPPORTS_MINUS_F=$(tmux list-sessions -F '#{session_name}' > /dev/null 2>&1 && echo 0 || echo 1)
+#...but that hangs on Linux due to epoll problems -- see
+# https://sourceforge.net/tracker/?func=detail&atid=973262&aid=3489496&group_id=200378
+#TMUX_SUPPORTS_MINUS_F=1  #disable -F support
+# -F support is required now
+
+get_base_session_id()
+{
+    tmux ls -F '#{session_id}:#{session_name}' | egrep "^[^:]+:${base_session_name}\$" | cut -d: -f1
+}
+
+kill_unattached_sessions ()
+{
+    local session_list=`tmux ls -F '#{session_id}:#{session_group}:#{session_attached}'`
+    # get group id
+    local group_id=`grep "^${base_session_id}:" <<<"$session_list" | cut -d: -f2`
+    if [ -n "$group_id" ]
+    then
+        local kill_list=`grep ":${group_id}:0$" <<<"$session_list" | cut -d: -f1`
+        for i in $kill_list
+        do
+            [ "$i" != "$base_session_id" ] && tmux kill-session -t "$i"
+        done
+    fi
+}
+
+# start base_session, if it doesn't exist.
+base_session_name="$1"
+$TMUX_CMD new-session -d -s "$base_session_name" || true
+base_session_id=`get_base_session_id`
+
+if [ -z "$base_session_id" ]
+then
+    echo something goes wrong
+    exit 1
+fi
+
+kill_unattached_sessions
+for i in `seq 50`
+do
+    # try to creat a new window until we succeed
+    $TMUX_CMD new-session -t "$base_session_id" -s "${base_session_name}-${i}" && exit;
+done
+
+echo Oops
+exit 1
