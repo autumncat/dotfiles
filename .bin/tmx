@@ -69,13 +69,19 @@ fi
 
 kill_unattached_sessions
 
-session_list=`tmux ls -F '#{session_name}'`
+declare -A session_list=()
+for i in `tmux ls -F '#{session_name}'`
+do
+    session_list["$i"]=1
+done
 for i in `seq 50`
 do
     # skip occupied names
-    grep "${base_session_name}-${i}" <<<"$session_list" && continue
-    # try to creat a new window until we succeed
-    exec $TMUX_CMD new-session -t "$base_session_id" -s "${base_session_name}-${i}"
+    if [ -z "${session_list[${base_session_name}-${i}]}" ]
+    then
+        # try to creat a new window until we succeed
+        exec $TMUX_CMD new-session -t "$base_session_id" -s "${base_session_name}-${i}"
+    fi
 done
 
 echo Oops
